@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Method Inference</title>
+</head>
+<body>
+    <div style="text-align:center;">
+        <h1>Travel Method Inference</h1>
+        <!-- Input form -->
+        <form id="prediction-form">
+
+          <div style="margin-bottom: 10px;">
+            <label for="vehicle_count">Household Vehicle Count:</label>
+            <select name="vehicle_count" id="vehicle_count">
+              {% for value in vehicle_count %}
+                  <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+          </div>
+  
+            <div style="margin-bottom: 10px;">
+          <label for="hhincome_broad">Household Income:</label>
+            <select name="hhincome_broad" id="hhincome_broad">
+              {% for value in hhincome_broad %}
+                  <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+            </div>
+
+          <div style="margin-bottom: 10px;">  
+          <label for="car_share">Household Car Share:</label>
+            <select name="car_share" id="car_share">
+              {% for value in car_share %}
+                  <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+            <!-- Add similar dropdown menus for other features -->
+            <div style="margin-bottom: 10px;">
+          <label for="numadults">Household Adult Number:</label>
+            <select name="numadults" id="numadults">
+              {% for value in numadults %}
+                  <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+            </div>
+
+            <div style="margin-bottom: 10px;">
+          <label for="numchildren">Household Child Number:</label>
+            <select name="numchildren" id="numchildren">
+              {% for value in numchildren %}
+                  <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+            </div>
+
+            <div style="margin-bottom: 10px;">
+          <label for="age_category">Age:</label>
+            <select name="age_category" id="age_category">
+              {% for value in age_category %}
+                  <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+            </div>
+
+            <div style="margin-bottom: 10px;">
+          <label for="gender">Gender:</label>
+            <select name="gender" id="gender">
+              {% for value in gender %}
+                  <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+            </div>
+
+            <div style="margin-bottom: 10px;">
+          <label for="employment">Employment:</label>
+            <select name="employment" id="employment">
+              {% for value in employment %}
+                  <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+            </div>
+
+            <div style="margin-bottom: 10px;">
+          <label for="education">Education:</label>
+            <select name="education" id="education">
+              {% for value in education %}
+                  <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+            </div>
+
+            <div style="margin-bottom: 10px;">
+          <label for="license">Driver License:</label>
+            <select name="license" id="license">
+              {% for value in license %}
+                  <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+            </div>
+
+          <div style="margin-bottom: 10px;">
+          <label for="origin_census_tract">Origin Census Tract:</label>
+          <select name="origin_census_tract" id="origin_census_tract">
+              {% for value in origin_tracts %}
+                  <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+          </select>
+          </div>
+
+          <!-- Dropdown menu for Destination Census Tract -->
+          <div style="margin-bottom: 10px;">
+          <label for="destination_census_tract">Destination Census Tract:</label>
+          <select name="destination_census_tract" id="destination_census_tract">
+              {% for value in destination_tracts %}
+                  <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+          </select>
+          </div>
+
+            <button type="submit">Predict</button>
+        </form>
+    </div>
+
+    <div id="prediction-results" style="text-align:center; margin-top: 20px;">
+      <h2>Trip Volume</h2>
+      <div style="margin-bottom: 10px;">
+          <p>This individual would make {{ volume }} unique trip routes per month</p>
+      </div>
+      <h2>Method Probability</h2>
+      <div style="margin-bottom: 10px;">
+          <p>Bike: {{ prediction_results[0] }}</p>
+      </div>
+      <div style="margin-bottom: 10px;">
+          <p>Household Vehicle: {{ prediction_results[1] }}</p>
+      </div>
+      <div style="margin-bottom: 10px;">
+          <p>Other: {{ prediction_results[2] }}</p>
+      </div>
+      <div style="margin-bottom: 10px;">
+          <p>Shared Vehicle: {{ prediction_results[3] }}</p>
+      </div>
+      <div style="margin-bottom: 10px;">
+          <p>Public Transit: {{ prediction_results[4] }}</p>
+      </div>
+      <div style="margin-bottom: 10px;">
+          <p>Walk: {{ prediction_results[5] }}</p>
+      </div>
+    </div>
+
+  <script>
+      document.getElementById('prediction-form').addEventListener('submit', function(event) {
+          event.preventDefault(); // Prevent default form submission
+          var form = this;
+          var formData = new FormData(form);
+
+          // Send form data asynchronously
+          fetch('/', {
+              method: 'POST',
+              body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+              // Update prediction results section with the received data
+              var predictionResultsDiv = document.getElementById('prediction-results');
+              predictionResultsDiv.innerHTML = data.html;
+
+              // Update map with origin and destination coordinates
+              var originCoord = data.origin_coord;
+              var destinationCoord = data.destination_coord;
+              initializeLeafletMap(originCoord, destinationCoord);
+          })
+          .catch(error => console.error('Error:', error));
+      });
+
+      function initializeLeafletMap(originCoord, destinationCoord) {
+          var map = L.map('map').setView([47.542204, -122.319717], 10); // Seattle coordinates
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+          // Add markers for origin and destination coordinates
+          L.marker(originCoord).addTo(map).bindPopup('Origin').openPopup();
+          L.marker(destinationCoord).addTo(map).bindPopup('Destination').openPopup();
+
+          // Add polyline connecting origin and destination coordinates
+          var polyline = L.polyline([originCoord, destinationCoord], {color: 'blue'}).addTo(map);
+          map.fitBounds(polyline.getBounds());
+      }
+  </script>
+
+</body>
+</html>

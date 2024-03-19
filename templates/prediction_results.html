@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Results</title>
+</head>
+<body>
+  <h2>Trip Volume</h2>
+  <div style="margin-bottom: 10px;">
+      <p>This individual would make {{ volume }} unique trip routes per month (21:00-5:00, 5:00-13:00, 13:00-21:00) if they were to travel from the selected Census Tract.</p>
+  </div>
+  <h2>Map of Seattle Area</h2>
+  <div id="map" style="height: 400px;"></div>
+  <h2>Method Probability</h2>
+  <div style="margin-bottom: 10px;">
+      <p>Bike: {{ prediction_results[0] }}</p>
+  </div>
+  <div style="margin-bottom: 10px;">
+      <p>Household Vehicle: {{ prediction_results[1] }}</p>
+  </div>
+  <div style="margin-bottom: 10px;">
+      <p>Other: {{ prediction_results[2] }}</p>
+  </div>
+  <div style="margin-bottom: 10px;">
+      <p>Shared Vehicle: {{ prediction_results[3] }}</p>
+  </div>
+  <div style="margin-bottom: 10px;">
+      <p>Public Transit: {{ prediction_results[4] }}</p>
+  </div>
+  <div style="margin-bottom: 10px;">
+      <p>Walk: {{ prediction_results[5] }}</p>
+  </div>
+  <!-- Add similar divs for other prediction results -->
+</body>
+</html>
