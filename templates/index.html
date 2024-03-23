@@ -105,19 +105,9 @@
             </div>
 
           <div style="margin-bottom: 10px;">
-          <label for="origin_census_tract">Origin Census Tract:</label>
+          <label for="origin_census_tract">Origin Census Block Group:</label>
           <select name="origin_census_tract" id="origin_census_tract">
               {% for value in origin_tracts %}
-                  <option value="{{ value }}">{{ value }}</option>
-              {% endfor %}
-          </select>
-          </div>
-
-          <!-- Dropdown menu for Destination Census Tract -->
-          <div style="margin-bottom: 10px;">
-          <label for="destination_census_tract">Destination Census Tract:</label>
-          <select name="destination_census_tract" id="destination_census_tract">
-              {% for value in destination_tracts %}
                   <option value="{{ value }}">{{ value }}</option>
               {% endfor %}
           </select>

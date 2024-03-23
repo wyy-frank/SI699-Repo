@@ -33,13 +33,14 @@ class FirstModel():
     
 
 class SecondModel():
-  def __init__(self, toy, coord):
+  def __init__(self, toy, coord, coord_bg):
     self.toy = toy
     self.coord = coord
+    self.coord_bg = coord_bg
 
   def predict(self, origin):
-    destination  = self.toy[self.toy['o_tract10']==origin]['d_tract10'].values[0]
-    o_coord = self.coord[self.coord['TRACT']==origin][["centroid_y", "centroid_x"]].values
+    destination  = self.toy[self.toy['o_tract10']==float(np.floor(origin/10))]['d_tract10'].values[0]
+    o_coord = self.coord_bg[self.coord_bg['TRACT']==origin][["centroid_y", "centroid_x"]].values
     d_coord = self.coord[self.coord['TRACT']==destination][["centroid_y", "centroid_x"]].values
     return o_coord, d_coord, destination
 

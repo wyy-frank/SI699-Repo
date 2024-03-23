@@ -10,9 +10,8 @@ import pickle
 
 app = Flask(__name__)
 
-data = pd.read_csv('tables/clustering.csv')
-origin_tracts = data['TRACT'].unique().tolist()
-destination_tracts = origin_tracts
+data = pd.read_csv('tables/coord_xy_bg.csv')
+origin_tracts = data['TRACT'].unique().tolist()[:-1]
 
 age_category = pd.read_csv('tables/pca_values/age_category.csv')
 car_share = pd.read_csv('tables/pca_values/car_share.csv')
@@ -33,6 +32,7 @@ outer_x = pd.read_csv("tables/outer_x.csv", index_col=0)
 outer_y = pd.read_csv("tables/outer_y.csv", index_col=0)
 toy = pd.read_csv("tables/second_toy.csv", index_col=0)
 coord = pd.read_csv("tables/coord_xy.csv", index_col=0)
+coord_bg = pd.read_csv("tables/coord_xy_bg.csv", index_col=0)
 x = pd.read_csv("tables/x.csv", index_col=0)
 y = pd.read_csv("tables/y.csv", index_col=0)
 w = pd.read_csv("tables/w.csv", index_col=0)
@@ -43,9 +43,9 @@ w = pd.read_csv("tables/w.csv", index_col=0)
 #with open('model/firstmodel.pkl', 'wb') as f:
 #  pickle.dump(first_model, f)
 
-#second_model = SecondModel(toy, coord)
-#with open('model/secondmodel.pkl', 'wb') as f:
-#  pickle.dump(second_model, f)
+second_model = SecondModel(toy, coord, coord_bg)
+with open('model/secondmodel.pkl', 'wb') as f:
+  pickle.dump(second_model, f)
 
 #third_model = ThirdModel(cluster, inter, outer)
 #third_model.train(inter_x, inter_y, outer_x, outer_y)
@@ -78,8 +78,7 @@ def index():
             request.form['employment'],
             request.form['education'],
             request.form['license'],
-            float(request.form['origin_census_tract']),
-            float(request.form['destination_census_tract'])
+            float(request.form['origin_census_tract'][:-1]),
         ]
 
         volume = first_model.predict(features[:11])
@@ -91,6 +90,7 @@ def index():
         destination = second_model.predict(float(request.form['origin_census_tract']))[2]
 
         # Make prediction using the loaded model)
+        features.append(destination)
         prediction = third_model.predict(features)
         prediction[prediction<0] = 0
         prediction[5] = prediction[6]
@@ -121,7 +121,6 @@ def index():
                            numchildren=numchildren['numchildren'].unique().tolist(),
                            vehicle_count=vehicle_count['vehicle_count'].unique().tolist(),
                            origin_tracts=origin_tracts,
-                           destination_tracts=destination_tracts,
                            volume = volume,
                            prediction_results=prediction_results)
 
