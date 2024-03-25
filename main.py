@@ -44,13 +44,15 @@ w = pd.read_csv("tables/w.csv", index_col=0)
 #with open('model/firstmodel.pkl', 'wb') as f:
 #  pickle.dump(first_model, f)
 
-#graph = nx.read_graphml("model/directed_weighted_graph_with_potential_divergence.graphml")
-#second_model = SecondModel(coord_bg, graph)
-#with open('model/secondmodel.pkl', 'wb') as f:
-#  pickle.dump(second_model, f)
+graph = nx.read_graphml("model/directed_weighted_graph_with_potential_divergence.graphml")
+second_model = SecondModel(coord_bg, graph)
+with open('model/secondmodel.pkl', 'wb') as f:
+  pickle.dump(second_model, f)
 
 #third_model = ThirdModel(cluster, inter, outer)
 #third_model.train(inter_x, inter_y, outer_x, outer_y)
+#with open('model/thirdmodel.pkl', 'wb') as f:
+#  pickle.dump(third_model, f)
 
 with open('model/firstmodel.pkl', 'rb') as f:
   first_model = pickle.load(f)
