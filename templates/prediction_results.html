@@ -14,25 +14,38 @@
   </div>
   <h2>Map of Seattle Area</h2>
   <div id="map" style="height: 400px;"></div>
-  <h2>Method Probability</h2>
-  <div style="margin-bottom: 10px;">
-      <p>Bike: {{ prediction_results[0] }}</p>
+  
+  <style>
+    .column {
+      width: 100px; /* Adjust the width as needed */
+    }
+  </style>
+  <div style="text-align: center;">
+    <h2>Method Probability</h2>
+    <table border="1" style="margin: 0 auto;">
+      <tr>
+        <th>Destination</th>
+        <th class="column">Bike</th>
+        <th class="column">Household Vehicle</th>
+        <th class="column">Other</th>
+        <th class="column">Shared Vehicle</th>
+        <th class="column">Public Transit</th>
+        <th class="column">Walk</th>
+      </tr>
+      {% for destination_index in range(destination_list|length) %}
+      <tr>
+        <td><strong>{{ destination_list[destination_index] }}</strong></td>
+        <td class="column">{{ prediction_result_list[destination_index][0] }}</td>
+        <td class="column">{{ prediction_result_list[destination_index][1] }}</td>
+        <td class="column">{{ prediction_result_list[destination_index][2] }}</td>
+        <td class="column">{{ prediction_result_list[destination_index][3] }}</td>
+        <td class="column">{{ prediction_result_list[destination_index][4] }}</td>
+        <td class="column">{{ prediction_result_list[destination_index][5] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
   </div>
-  <div style="margin-bottom: 10px;">
-      <p>Household Vehicle: {{ prediction_results[1] }}</p>
-  </div>
-  <div style="margin-bottom: 10px;">
-      <p>Other: {{ prediction_results[2] }}</p>
-  </div>
-  <div style="margin-bottom: 10px;">
-      <p>Shared Vehicle: {{ prediction_results[3] }}</p>
-  </div>
-  <div style="margin-bottom: 10px;">
-      <p>Public Transit: {{ prediction_results[4] }}</p>
-  </div>
-  <div style="margin-bottom: 10px;">
-      <p>Walk: {{ prediction_results[5] }}</p>
-  </div>
+
   <!-- Add similar divs for other prediction results -->
 </body>
 </html>

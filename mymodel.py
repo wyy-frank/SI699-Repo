@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import networkx as nx
 from sklearn.neighbors import KernelDensity
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
@@ -33,16 +34,17 @@ class FirstModel():
     
 
 class SecondModel():
-  def __init__(self, toy, coord, coord_bg):
-    self.toy = toy
-    self.coord = coord
-    self.coord_bg = coord_bg
+  def __init__(self, coord, graph):
+      self.coord = coord
+      self.graph = graph
 
-  def predict(self, origin):
-    destination  = self.toy[self.toy['o_tract10']==float(np.floor(origin/10))]['d_tract10'].values[0]
-    o_coord = self.coord_bg[self.coord_bg['TRACT']==origin][["centroid_y", "centroid_x"]].values
-    d_coord = self.coord[self.coord['TRACT']==destination][["centroid_y", "centroid_x"]].values
-    return o_coord, d_coord, destination
+  def predict(self, origin, volume):
+    origin_des = self.coord[self.coord['TRACT']==origin][['centroid_x', 'centroid_y']].values[0]
+    neighbors = list(self.graph.neighbors(str(origin)))
+    neighbors_sorted = sorted(neighbors, key=lambda x: self.graph.nodes[x].get('Potential', 0), reverse=True)[:int(volume)]
+    neighbors_sorted = [float(i) for i in neighbors_sorted]
+    data = self.coord[self.coord['TRACT'].isin(neighbors_sorted)]
+    return origin_des.tolist(), data['TRACT'].values.tolist(), data['centroid_x'].values.tolist(), data['centroid_y'].values.tolist()
 
     
 

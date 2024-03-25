@@ -7,6 +7,7 @@ from mymodel import FirstModel, SecondModel, ThirdModel
 from joblib import dump, load
 import json
 import pickle
+import networkx as nx
 
 app = Flask(__name__)
 
@@ -43,9 +44,10 @@ w = pd.read_csv("tables/w.csv", index_col=0)
 #with open('model/firstmodel.pkl', 'wb') as f:
 #  pickle.dump(first_model, f)
 
-second_model = SecondModel(toy, coord, coord_bg)
-with open('model/secondmodel.pkl', 'wb') as f:
-  pickle.dump(second_model, f)
+#graph = nx.read_graphml("model/directed_weighted_graph_with_potential_divergence.graphml")
+#second_model = SecondModel(coord_bg, graph)
+#with open('model/secondmodel.pkl', 'wb') as f:
+#  pickle.dump(second_model, f)
 
 #third_model = ThirdModel(cluster, inter, outer)
 #third_model.train(inter_x, inter_y, outer_x, outer_y)
@@ -83,29 +85,35 @@ def index():
 
         volume = first_model.predict(features[:11])
 
-        origin_coord = second_model.predict(float(request.form['origin_census_tract']))[0].tolist()[0]
+        origin_coord = second_model.predict(int(request.form['origin_census_tract']), sum(volume))[0]
 
-        destination_coord = second_model.predict(float(request.form['origin_census_tract']))[1].tolist()[0]
+        destination = second_model.predict(int(request.form['origin_census_tract']), sum(volume))[1]
 
-        destination = second_model.predict(float(request.form['origin_census_tract']))[2]
+        destination_coord_x = second_model.predict(int(request.form['origin_census_tract']), sum(volume))[2]
+
+        destination_coord_y = second_model.predict(int(request.form['origin_census_tract']), sum(volume))[3]
 
         # Make prediction using the loaded model)
-        features.append(destination)
-        prediction = third_model.predict(features)
-        prediction[prediction<0] = 0
-        prediction[5] = prediction[6]
-        prediction = prediction[0:6]
-
-        prediction = np.round(prediction/sum(prediction),2)
-
-        # Assuming prediction is a list of 6 floats
-        prediction_results = [str(result) for result in prediction]
+        prediction_result_list = []  
+        for i in range(len(destination)):
+          features.append(float(str(destination[i])[:11]))
+          prediction = third_model.predict(features)
+          features.pop()
+          prediction[prediction<0] = 0
+          prediction[5] = prediction[6]
+          prediction = prediction[0:6]
+          prediction = np.round(prediction/sum(prediction),2)
+          prediction_results = [str(result) for result in prediction]
+          prediction_result_list.append(prediction_results)
 
         return jsonify(html=render_template('prediction_results.html',
      volume=volume,
-     prediction_results=prediction_results),
+     prediction_result_list=prediction_result_list,
+                                           destination_list = destination),
   origin_coord=origin_coord,
-  destination_coord=destination_coord)
+  destination_coord_x=destination_coord_x,
+                      destination_coord_y=destination_coord_y,
+                      destination=destination,)
         
 
     # Render the index template with no prediction results

@@ -162,23 +162,53 @@
 
               // Update map with origin and destination coordinates
               var originCoord = data.origin_coord;
-              var destinationCoord = data.destination_coord;
-              initializeLeafletMap(originCoord, destinationCoord);
+              var destinationCoordx = data.destination_coord_x;
+              var destinationCoordy = data.destination_coord_y;
+              var destination = data.destination;
+              initializeLeafletMap(originCoord, destinationCoordx, destinationCoordy, destination);
           })
           .catch(error => console.error('Error:', error));
       });
 
-      function initializeLeafletMap(originCoord, destinationCoord) {
+      function initializeLeafletMap(originCoord, destinationCoordx, destinationCoordy, destination) {
           var map = L.map('map').setView([47.542204, -122.319717], 10); // Seattle coordinates
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
           // Add markers for origin and destination coordinates
-          L.marker(originCoord).addTo(map).bindPopup('Origin').openPopup();
-          L.marker(destinationCoord).addTo(map).bindPopup('Destination').openPopup();
+        // Assuming you have destinationCoordx, destinationCoordy, and destination arrays
+        // Assuming originCoord is defined somewhere earlier
 
-          // Add polyline connecting origin and destination coordinates
-          var polyline = L.polyline([originCoord, destinationCoord], {color: 'blue'}).addTo(map);
-          map.fitBounds(polyline.getBounds());
+        // Update originCoord
+        originCoord = [originCoord[1], originCoord[0]];
+        L.marker(originCoord).addTo(map).bindPopup('Origin').openPopup();
+
+        // Initialize bounds to fit all markers and polylines
+        var bounds = [];
+
+        // Iterate through each pair of x and y coordinates
+        for (var i = 0; i < destinationCoordx.length; i++) {
+            var destinationCoord = [destinationCoordy[i], destinationCoordx[i]];
+
+            // Add marker for each destination point
+            L.marker(destinationCoord).addTo(map).bindPopup('Destination ' + destination[i]);
+
+            // Add each destination coordinate to bounds
+            bounds.push(destinationCoord);
+
+            // Add polyline connecting origin and destination coordinates
+            var polyline = L.polyline([originCoord, destinationCoord], {color: 'blue'}).addTo(map);
+
+            // Add polyline to bounds
+            bounds.push(polyline.getBounds());
+        }
+
+        // Fit map to the bounds containing all markers and polylines
+        map.fitBounds(bounds);
+
+        // Optionally, you can set a minimum zoom level to prevent zooming in too much
+        map.setMinZoom(map.getZoom());
+
+
       }
   </script>
 

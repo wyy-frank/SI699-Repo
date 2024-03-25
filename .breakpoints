@@ -1,3 +1,24 @@
 {
-  "files": {}
+  "files": {
+    "mymodel.py": [
+      {
+        "id": "be63f97a-daf0-40a7-bac7-a604dd899e82",
+        "line": 35,
+        "version": 601,
+        "index": 1353
+      },
+      {
+        "id": "38e6b3cb-757b-4fdd-9cbb-f0de4f69a059",
+        "line": 36,
+        "version": 601,
+        "index": 1354
+      },
+      {
+        "id": "a53d4e13-abbb-4e12-8a3a-6bacc33e7aa1",
+        "line": 37,
+        "version": 601,
+        "index": 1375
+      }
+    ]
+  }
 }
